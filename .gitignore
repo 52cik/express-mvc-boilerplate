@@ -1,0 +1,8 @@
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+Desktop.ini
+coverage
+node_modules
+npm-debug.log
