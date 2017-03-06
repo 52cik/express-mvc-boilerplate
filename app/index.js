@@ -1,5 +1,3 @@
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -7,30 +5,37 @@ const favicon = require('serve-favicon');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
+// require('./models'); // 预加载所有模型
+
+const cfg = require('./config'); // 全局配置
+
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'app', 'views'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
-app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
+app.use(favicon(path.join(__dirname, 'web', 'favicon.png')));
 
 // request logger
 if (app.get('env') === 'development') {
   app.use(require('morgan')('dev'));
 }
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: cfg.jsonLimit }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// 静态资源应该移除，有第三方cdn处理
+app.use(express.static(path.join(__dirname, 'web'))); // 静态资源
 
 // auto apply routers
-const controllers = fs.readdirSync(path.join(__dirname, 'app', 'controllers'));
-controllers.forEach(function (controller) {
-  if (/\.js$/i.test(controller)) {
-    require('./app/controllers/' + controller)(app);
+const ctrlPath = path.join(__dirname, 'controllers');
+const controllers = fs.readdirSync(ctrlPath);
+controllers.forEach(function (ctrl) {
+  if (/\.js$/i.test(ctrl)) {
+    require(path.join(ctrlPath, ctrl))(app);
   }
 });
 
@@ -48,7 +53,7 @@ if (app.get('env') === 'development') {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
-      error: err
+      error: err,
     });
   });
 }
@@ -59,7 +64,7 @@ app.use(function (err, req, res) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
-    error: {}
+    error: {},
   });
 });
 

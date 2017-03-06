@@ -1,5 +1,3 @@
-'use strict';
-
 const router = require('express').Router();
 
 // apply router
@@ -9,6 +7,6 @@ module.exports = function (app) {
 
 
 /* GET users listing. */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
   res.send('respond with a resource');
 });
